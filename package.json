@@ -9,11 +9,14 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@firebase/database": "^0.14.1",
     "@react-native-async-storage/async-storage": "^1.17.11",
     "@react-navigation/bottom-tabs": "^6.5.3",
     "@react-navigation/native": "^6.1.2",
     "@react-navigation/native-stack": "^6.9.8",
+    "@react-query-firebase/database": "^1.0.0-dev.2",
     "date-fns": "^2.29.3",
+    "eas-cli": "^3.4.1",
     "expo": "~47.0.12",
     "expo-constants": "^14.0.2",
     "expo-location": "^15.0.1",
@@ -24,12 +27,14 @@
     "react": "18.1.0",
     "react-native": "0.70.5",
     "react-native-geolocation-service": "^5.3.1",
+    "react-native-gesture-handler": "~2.8.0",
     "react-native-maps": "^1.3.2",
     "react-native-modal": "^13.0.1",
     "react-native-safe-area-context": "^4.4.1",
     "react-native-screens": "^3.18.2",
     "react-native-svg": "13.4.0",
-    "react-native-vector-icons": "^9.2.0"
+    "react-native-vector-icons": "^9.2.0",
+    "react-navigation": "^4.4.4"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Constants from "expo-constants";
-import { StyleSheet, Image, Alert } from "react-native";
+import { StyleSheet, Image, Alert, ActivityIndicator } from "react-native";
 import {
   Box,
   Text,
@@ -31,6 +31,7 @@ export default class Pengumuman extends Component {
     this.state = {
       isi: "",
       namapegawai: "",
+      isLoading: false,
     };
   }
 
@@ -47,11 +48,13 @@ export default class Pengumuman extends Component {
 
   componentDidMount(){
     this.get();
+    this.setState({ isLoading: true });
     getDocs(collection(firebase, "pengumuman")).then((docSnap) => {
       let data = [];
       docSnap.forEach((doc) => {
         data.push({ ...doc.data(), id: doc.id });
       });
+      this.setState({ isLoading: false });
       this.setState({
           isi: data[0].isi,
       });
@@ -131,7 +134,11 @@ export default class Pengumuman extends Component {
             </Flex>
             <Center>
                 <Box mb="5" borderRadius="10" borderColor="#57D1D1" borderWidth="1" shadow="9" bg="#FFFFFF" w="90%" h="550" justifyContent={"center"} alignItems={"center"}>
-                    <Text fontSize="xl" bold>{pengumuman}</Text>
+                    {this.state.isLoading ? (
+                      <ActivityIndicator size="large" color="#57D1D1" />
+                    ) : (
+                      <Text fontSize="xl" bold>{pengumuman}</Text>
+                    )}
                 </Box>
             </Center>
           </Box>
@@ -143,57 +150,3 @@ export default class Pengumuman extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    paddingHorizontal: 20,
-    elevation: 2,
-  },
-  buttonOpen: {
-    backgroundColor: "#F194FF",
-  },
-  buttonClose: {
-    backgroundColor: "#DD4F4F",
-  },
-  textStyle: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center",
-    lineHeight: 34,
-    fontSize: 18,
-  },
-  modalTitle: {
-    marginBottom: 15,
-    textAlign: "center",
-    lineHeight: 34,
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-});

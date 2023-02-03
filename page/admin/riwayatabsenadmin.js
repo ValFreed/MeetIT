@@ -29,7 +29,7 @@ import 'firebase/firestore';
 import firebase from './database/firebase';
 import { doc, setDoc, deleteDoc } from "firebase/firestore"; 
 
-export default class Riwayatabsendetail extends Component {
+export default class Riwayatabsenadmin extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -39,18 +39,6 @@ export default class Riwayatabsendetail extends Component {
       kode: "",
       isLoading: false,
     };
-  }
-
-  get = async () => {
-    try {
-      const nama = await AsyncStorage.getItem('namapegawai');
-      const username = await AsyncStorage.getItem('username');
-      if(nama !== null && username !== null) {
-          this.setState({namapegawai: nama, username: username });
-      }
-    }  catch (e){
-      console.error(e);
-    }
   }
 
   DeleteRecord=()=>{
@@ -66,13 +54,12 @@ export default class Riwayatabsendetail extends Component {
       })
       .catch((error) => {
         this.setState({ isLoading: false });
-        Alert.alert("Pemberitahuan","data gagal dihapus!");
           setError(error.message);
+          Alert.alert("Pemberitahuan","data gagal dihapus!");
       })
   }
 
   componentDidMount(){
-    this.get();
     const { data } = this.props.route.params;
     this.setState({kode: data.kode});
   }
@@ -155,7 +142,7 @@ export default class Riwayatabsendetail extends Component {
             </Center>
           </Box>
           <Box borderRadius="20" borderColor="#57D1D1" borderWidth="3" shadow="5" bg="#FFFFFF" w="95%" h="75" justifyContent={"center"} position={"absolute"} top={20} >
-            <Text  px="5" fontSize="20">Nama pegawai: {this.state.namapegawai}</Text>
+            <Text  px="5" fontSize="20" >Nama pegawai: {data.namapegawai}</Text>
           </Box>
         </VStack>
       </NativeBaseProvider>

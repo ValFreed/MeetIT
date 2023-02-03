@@ -4,7 +4,7 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
 import { format } from 'date-fns';
-import { StyleSheet, Image, Alert } from "react-native";
+import { StyleSheet, Image, Alert, ActivityIndicator } from "react-native";
 import {
   Box,
   Text,
@@ -45,6 +45,7 @@ export default class Absensi extends Component {
       namapegawai: "",
       username: "",
       indek:"",
+      isLoading: false,
     };
   }
 
@@ -61,17 +62,20 @@ export default class Absensi extends Component {
   }
 
   InsertRecord=()=>{
+    this.setState({ isLoading: true });
     var jam = this.state.jam;
     var tanggal = this.state.tanggal;
     var username = this.state.username;
     var latitude = this.state.latitude;
     var longitude = this.state.longitude;
     var indek = this.state.indek;
+    const kode = indek.concat(username);
     if ((latitude.length==0) || (longitude.length==0)){
         alert("Reload Aplikasi");
+        this.setState({ isLoading: false });
     }else{
-      setDoc(doc(firebase, "riwayatabsen", indek),{
-        kode: indek,
+      setDoc(doc(firebase, "riwayatabsen", kode),{
+        kode: kode,
         jam: jam,
         tanggal: tanggal,
         username: username,
@@ -80,11 +84,14 @@ export default class Absensi extends Component {
       })
       .then(() => {
           //jika login berhasil maka masuk halaman login
+          this.setState({ isLoading: false });
           console.log("data berhasil submit");
-          Alert.alert("Terimakasih Telah Hadir!");
+          Alert.alert("Pemberitahuan","Terimakasih Telah Hadir!");
       })
       .catch((error) => {
           //jika mengambil data gagal, akan tampil error
+          this.setState({ isLoading: false });
+          Alert.alert("Pemberitahuan","Gagal Absen!");
           setError(error.message);
       })
     }
@@ -103,7 +110,7 @@ export default class Absensi extends Component {
   componentDidMount(){
     const jam = format(new Date(), 'HH:mm:ss');
     const tanggal = format(new Date(), 'dd-MM-yyyy');
-    const indek = format(new Date(), 'yyyy-MM-dd-HH:mm:ss');
+    const indek = format(new Date(), 'yyyyMMddHHmmss');
     this.setState({jam, tanggal, indek});
     this.get();
   }
@@ -145,6 +152,9 @@ export default class Absensi extends Component {
           <Box height={"60%"} width={"100%"} bg="#FFFFFF" style={{ flex: 85 }} borderTopRadius="50">
             <Center>
                 <Box mt="20" mb="3" shadow="4" borderColor="#57D1D1" borderWidth="1" borderRadius="10" bg="#808080" w="90%" h="400" justifyContent={"center"} alignItems={"center"}>
+                {this.state.isLoading ? (
+                  <ActivityIndicator size="large" color="#0000ff" />
+                ) : (
                   <MapView
                     style={{ width: '97%', height: '97%', flex: 1, position: "absolute"}}
                     initialRegion={{
@@ -163,6 +173,7 @@ export default class Absensi extends Component {
                         description={`Latitude: ${this.state.latitude}, Longitude: ${this.state.longitude}`}
                     />
                   </MapView>
+                )}
                 </Box>
                 <Box mb="4" borderRadius="20" borderWidth="1" shadow="5" bg="#FFFFFF" w="90%" h="75" justifyContent={"center"} alignItems={"center"}>
                     <Text style={{fontSize: 21, fontWeight: "bold"}}>{this.state.tanggal}</Text>
@@ -200,57 +211,3 @@ export default class Absensi extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    paddingHorizontal: 20,
-    elevation: 2,
-  },
-  buttonOpen: {
-    backgroundColor: "#F194FF",
-  },
-  buttonClose: {
-    backgroundColor: "#DD4F4F",
-  },
-  textStyle: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center",
-    lineHeight: 34,
-    fontSize: 18,
-  },
-  modalTitle: {
-    marginBottom: 15,
-    textAlign: "center",
-    lineHeight: 34,
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-});

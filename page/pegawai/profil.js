@@ -20,6 +20,7 @@ import {
   NativeBaseProvider,
   Slide,
   View,
+  ScrollView,
 } from "native-base";
 import Feather from "react-native-vector-icons/Feather";
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -37,6 +38,7 @@ export default class Riwayat extends Component {
       namapegawai: "",
       check_textInputChange: false,
       secureTextEntry: true,
+      isLoading: false,
     };
   }
 
@@ -57,19 +59,21 @@ export default class Riwayat extends Component {
   }
 
   UpdateData = () => {
-    var Username = this.state.username
+    this.setState({ isLoading: true });
+    var Username = this.state.username;
     var Password = this.state.password;
-    var kosong = null;
     updateDoc(doc(firebase, "pegawai", Username),{
       password: Password
     })
     .then(() => {
+      this.setState({ isLoading: false });
         console.log("Password Berhasil DiUpdate");
         Alert.alert("Pemberitahuan","Password Berhasil DiUpdate");
-        this.setState({Password: kosong})
     })
     .catch(error => {
+      this.setState({ isLoading: false });
         console.log(error);
+        Alert.alert("Pemberitahuan","Password Gagal DiUpdate");
     })
   };
 
@@ -77,7 +81,7 @@ export default class Riwayat extends Component {
     const { navigation } = this.props;
     AsyncStorage.clear();
     navigation.navigate('Login');
-}
+  }
 
   updateSecureTextEntry() {
     this.setState({
@@ -100,12 +104,17 @@ export default class Riwayat extends Component {
           <Box height={"60%"} width={"100%"} bg="#FFFFFF" style={{ flex: 85 }} borderTopRadius="50" >
             <Center>
                 <Box mt="10" borderRadius="100" borderColor="#57D1D1" borderWidth="1" shadow="9" bg="#FFFFFF" w="75" h="75" justifyContent={"center"} alignItems={"center"}>
-                    <Icon
+                  {this.state.isLoading ? (
+                      <ActivityIndicator size="large" color="#57D1D1" />
+                    ) : (
+                      <Icon
                         name="user"
                         size={30}
                         color='#000000'
-                    />
+                      />
+                    )}
                 </Box>
+                <ScrollView>
                 <FormControl w="95%" pt="20%" >
                   <FormControl.Label>
                         <Text fontFamily="heading" fontWeight="500" fontSize="xl">Nama Pegawai</Text>
@@ -189,6 +198,7 @@ export default class Riwayat extends Component {
                         </Text>
                     </Pressable>
                 </HStack>
+                </ScrollView>
             </Center>
           </Box>
         </VStack>
@@ -196,57 +206,3 @@ export default class Riwayat extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    paddingHorizontal: 20,
-    elevation: 2,
-  },
-  buttonOpen: {
-    backgroundColor: "#F194FF",
-  },
-  buttonClose: {
-    backgroundColor: "#DD4F4F",
-  },
-  textStyle: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center",
-    lineHeight: 34,
-    fontSize: 18,
-  },
-  modalTitle: {
-    marginBottom: 15,
-    textAlign: "center",
-    lineHeight: 34,
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-});

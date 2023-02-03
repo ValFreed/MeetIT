@@ -1,13 +1,10 @@
 import React, { Component } from "react";
 import Constants from "expo-constants";
-import { StyleSheet, Image, Alert } from "react-native";
+import { StyleSheet, Image, Alert, ActivityIndicator} from "react-native";
 import {
   Box,
   Text,
   Pressable,
-  Heading,
-  Link,
-  KeyboardAvoidingView,
   VStack,
   FormControl,
   Input,
@@ -18,6 +15,7 @@ import {
   NativeBaseProvider,
   Slide,
   View,
+  ScrollView,
 } from "native-base";
 import Feather from "react-native-vector-icons/Feather";
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -40,16 +38,27 @@ export default class Login extends Component {
       check_textInputChange: false,
       secureTextEntry: true,
       input: "",
+      isLoading: false,
+      isiusername: "",
+      isipassword: "",
     };
   }
+
 
   readData = () => {
     var Username = this.state.username;
     var Password = this.state.password;
     const { navigation } = this.props;
+    this.setState({ isLoading: true });
     if (Username.length == 0 || Password.length == 0) {
+      this.setState({ isLoading: false });
       alert("Harap Isi Form!");
     } else if (Username === "Admin" && Password === "Admin") {
+      this.setState({ isLoading: false, username: "", password: "" });
+      Alert.alert("Pemberitahuan","Selamat Datang Admin");
+      navigation.navigate('BottomNavigatoradmin');
+    } else if (Username === "Guest" && Password === "Guest") {
+      this.setState({ isLoading: false, username: "", password: ""  });
       Alert.alert("Selamat Datang");
       navigation.navigate('BottomNavigatorpegawai', {
         screen: 'Absensi',
@@ -92,8 +101,9 @@ export default class Login extends Component {
     console.log(this.state.password);
     const { navigation } = this.props;
     this.add();
-    if (this.state.username === "Admin" && this.state.password === "Admin") {
-      Alert.alert("Selamat Datang");
+    if (this.state.username === "Guest" && this.state.password === "Guest") {
+      this.setState({ isLoading: false, username: "", password: ""  });
+      Alert.alert("Pemberitahuan","Selamat Datang");
       navigation.navigate('BottomNavigatorpegawai', {
         screen: 'Absensi',
         params: {
@@ -105,16 +115,14 @@ export default class Login extends Component {
         this.state.username === this.state.dbusername &&
         this.state.password === this.state.dbpassword
       ){
+        this.setState({ isLoading: false, username: "", password: ""  });
         Alert.alert("Selamat Datang", this.state.dbnamapegawai);
         console.log("Login Berhasil");
-        navigation.navigate('BottomNavigatorpegawai', {
-          screen: 'Absensi',
-          params: {
-            nama: this.state.dbnamapegawai
-          },
-        });
+        navigation.navigate('BottomNavigatorpegawai');
       } else {
-        Alert.alert("Login Gagal");
+        this.setState({ isLoading: false, username: "", password: ""  });
+        Alert.alert("Pemberitahuan","Login Gagal");
+        this.forceUpdate();
       }
     }
   };
@@ -138,15 +146,17 @@ export default class Login extends Component {
             <Image source={require("../assets/logoapp/logo_app.png")} alt="Judul Logo" style={{ width: 232, height: 101}}/>
           </Center>
           <Box height={"60%"} width={"100%"} bg="#FFFFFF" style={{ flex: 80 }} borderTopRadius="50">
+            <ScrollView>
             <View>
-                <Text left="5" mt="20" style={{fontSize: 23, fontWeight: "bold"}}>Login</Text>
+                <Text left="5" mt="10" fontSize="5xl" bold>Login</Text>
             </View>
             <Center>
               <FormControl w="92%" pt="20%">
-                <Box mb="5" borderRadius="20" shadow="3" bg="#FFFFFF" w="100%" h="75">
+                <Box mb="5" borderRadius="10" shadow="3" bg="#FFFFFF" w="100%" h="75">
                     <Input
                         w="100%" h="75"
                         borderRadius="10" borderWidth="2"
+                        value={this.state.username}
                         onChangeText={(username) => this.setState({ username })}
                         size="xl"
                         p={2}
@@ -163,7 +173,7 @@ export default class Login extends Component {
                         }
                     />
                 </Box>
-                <Box mb="20" borderRadius="20" shadow="3" bg="#FFFFFF" w="100%" h="75">
+                <Box mb="20" borderRadius="10" shadow="3" bg="#FFFFFF" w="100%" h="75">
                     <Input
                         w="100%" h="75"
                         borderRadius="10" borderWidth="2"
@@ -177,6 +187,7 @@ export default class Login extends Component {
                         placeholderTextColor="#57D1D1"
                         secureTextEntry={this.state.secureTextEntry ? true : false}
                         onChangeText={(password) => this.setState({ password })}
+                        value={this.state.password}
                         InputLeftElement={
                             <Feather
                                 name="key"
@@ -199,6 +210,9 @@ export default class Login extends Component {
                     />
                 </Box>
               </FormControl>
+              {this.state.isLoading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+              ) : (
                 <Pressable
                   onPress={() => {this.readData();}}
                   bg="#57D1D1"
@@ -214,20 +228,10 @@ export default class Login extends Component {
                     Login
                   </Text>
                 </Pressable>
-              <Text mt="10" style={{fontSize: 20 }} fontWeight="thin">Absensi Online</Text>
+              )}
+              <Text mt="20" style={{fontSize: 20 }} fontWeight="thin">Absensi Online</Text>
             </Center>
-            <Box
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-                width: "100%",
-                paddingBottom: 10,
-                position: "absolute",
-                bottom: 0,
-              }}
-            >
-                
-            </Box>
+            </ScrollView>
           </Box>
         </VStack>
       </NativeBaseProvider>
